@@ -191,8 +191,8 @@ export default {
         {
           name: 'Simple Line Icons',
           url: '/icons/simple-line-icons',
-          icon: 'icon-star',
-        },
+            icon: 'icon-star',
+          },
       ],
     },
     {
