@@ -42,6 +42,11 @@ export default {
       },
     },
     {
+      name: 'Upload Vid',
+      url: '/upload',
+      icon: 'icon-cloud-upload'
+    },
+    {
       name: 'Base',
       url: '/base',
       icon: 'icon-puzzle',
@@ -75,6 +80,11 @@ export default {
           name: 'Forms',
           url: '/base/forms',
           icon: 'icon-puzzle',
+        },
+        {
+          name: 'Upload Vid',
+          url: '/base/forms',
+          icon: 'icon-cloud-upload',
         },
         {
           name: 'Jumbotrons',

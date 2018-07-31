@@ -32,6 +32,11 @@ const Dropdowns = Loadable({
   loading: Loading,
 });
 
+const Upload = Loadable({
+  loader: () => import('./views/Upload'),
+  loading: Loading,
+});
+
 const Forms = Loadable({
   loader: () => import('./views/Base/Forms'),
   loading: Loading,
@@ -195,6 +200,7 @@ const routes = [
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
+  { path: '/upload', name: 'Upload', component: Upload },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },
