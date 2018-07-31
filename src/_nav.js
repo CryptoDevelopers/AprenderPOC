@@ -1,6 +1,11 @@
 export default {
   items: [
     {
+      name: 'Homepage',
+      url: '/home',
+      icon: 'icon-home',
+    },
+    {
       name: 'Dashboard',
       url: '/dashboard',
       icon: 'icon-speedometer',
