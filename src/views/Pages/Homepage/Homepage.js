@@ -12,12 +12,6 @@ const options = {
 
 const bgImage = '/assets/img/edvirtual2.jpg'
 
-const styles = {
-  container: {
-    backgroundImage: url(${bgImage})
-  }
-};
-
 class Homepage extends Component {
   constructor(props) {
     super(props);
