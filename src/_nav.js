@@ -15,6 +15,11 @@ export default {
       },
     },
     {
+      name: 'Account',
+      url: '/account',
+      icon: 'icon-user',
+    },
+    {
       title: true,
       name: 'Theme',
       wrapper: {            // optional wrapper object

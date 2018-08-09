@@ -28,8 +28,10 @@ import { Colors, Typography } from './Theme';
 import Widgets from './Widgets';
 import Upload from './Upload';
 import Video from './Video';
+import Account from './Account';
 
 export {
+  Account,
   Upload,
   Video,
   Badges,

@@ -12,12 +12,6 @@ const options = {
 
 const bgImage = '/assets/img/edvirtual2.jpg'
 
-// const styles = {
-//   container: {
-//     backgroundImage: url(${bgImage})
-//   }
-// };
-
 class Homepage extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +21,7 @@ class Homepage extends Component {
     this.state = {
       collapse: true,
       fadeIn: true,
-      timeout: 300 
+      timeout: 300
     };
   }
 
