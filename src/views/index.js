@@ -27,8 +27,10 @@ import { Login, Page404, Page500, Register, Homepage} from './Pages';
 import { Colors, Typography } from './Theme';
 import Widgets from './Widgets';
 import Upload from './Upload';
+import Account from './Account';
 
 export {
+  Account,
   Upload,
   Badges,
   Typography,
