@@ -9873,5 +9873,11 @@ body {
   margin-top: 20px;
   width: 660px; }
 
+.pointer {
+  cursor: pointer; }
+
+.zoomout {
+  zoom: 10%; }
+
 html body .app.flex-row.align-items-center {
   height: 100vh; }
