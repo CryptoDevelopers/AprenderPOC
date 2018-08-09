@@ -9869,5 +9869,9 @@ body {
 .app-header .navbar-nav .dropdown-menu-right {
   right: auto; }
 
+.card-vid {
+  margin-top: 20px;
+  width: 660px; }
+
 html body .app.flex-row.align-items-center {
   height: 100vh; }
