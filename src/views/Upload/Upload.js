@@ -8,7 +8,7 @@ class Upload extends Component {
   render() {
 
     return (
-      <Card>
+      <Card className="mw-700">
         <CardHeader>
           <strong>Video Upload</strong> 
         </CardHeader>

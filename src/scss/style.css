@@ -9873,11 +9873,17 @@ body {
   margin-top: 20px;
   width: 660px; }
 
+.card {
+  margin-top: 20px; }
+
 .pointer {
   cursor: pointer; }
 
 .zoomout {
   zoom: 10%; }
+
+.mw-700 {
+  max-width: 700px; }
 
 html body .app.flex-row.align-items-center {
   height: 100vh; }
