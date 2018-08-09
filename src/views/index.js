@@ -27,9 +27,11 @@ import { Login, Page404, Page500, Register, Homepage} from './Pages';
 import { Colors, Typography } from './Theme';
 import Widgets from './Widgets';
 import Upload from './Upload';
+import Video from './Video';
 
 export {
   Upload,
+  Video,
   Badges,
   Typography,
   Colors,

@@ -47,6 +47,11 @@ export default {
       icon: 'icon-cloud-upload'
     },
     {
+      name: 'Videos',
+      url: '/videos',
+      icon: 'icon-social-youtube' // icon-social-youtube
+    },
+    {
       name: 'Base',
       url: '/base',
       icon: 'icon-puzzle',
@@ -80,11 +85,6 @@ export default {
           name: 'Forms',
           url: '/base/forms',
           icon: 'icon-puzzle',
-        },
-        {
-          name: 'Upload Vid',
-          url: '/base/forms',
-          icon: 'icon-cloud-upload',
         },
         {
           name: 'Jumbotrons',

@@ -37,6 +37,11 @@ const Upload = Loadable({
   loading: Loading,
 });
 
+const Video = Loadable({
+  loader: () => import('./views/Video'),
+  loading: Loading,
+});
+
 const Forms = Loadable({
   loader: () => import('./views/Base/Forms'),
   loading: Loading,
@@ -201,6 +206,7 @@ const routes = [
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
   { path: '/upload', name: 'Upload', component: Upload },
+  { path: '/videos', name: 'Video', component: Video },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },
