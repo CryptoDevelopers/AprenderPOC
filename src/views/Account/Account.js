@@ -15,27 +15,33 @@ class Account extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
+    console.log(this.state.buyAmnt)
 
     const purchase = {
-      buyAmnt: this.state.buyAmnt
-      user_ids: '982131'
+      amount: this.state.buyAmnt,
+      user_ids: 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
     };
 
-    console.log(user.buyAmnt)
+    console.log(purchase.buyAmnt)
 
-    axios.post('http://localhost:8000/airdrop', { purchase })
+    axios.post('http://localhost:8000/airdrop', purchase )
       .then(res => {
         console.log(res);
         console.log(res.data);
       })
   }
 
-  componentDidMount() {
-    axios.get('http://localhost:8000/balance')
+  getBalance = event => {
+    const user = {
+        user_ids: 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
+    };
+
+    axios.get('http://localhost:8000/balances')
     .then(res => {
       const bal = res.data;
       this.setState({balance: bal})
     })
+
   }
 
   render() {
@@ -73,7 +79,7 @@ class Account extends Component {
                   <h3>PRR balance</h3>
                   <hr className="my-2"/>
                   <h4>$PRR 69.99</h4>
-                  <Button color="primary">Refresh</Button>
+                  <Button onClick={this.getBalance} color="primary">Refresh</Button>
                 </CardBody>
                 </Card>
               </Col>
