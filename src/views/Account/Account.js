@@ -1,8 +1,42 @@
 import React, { Component } from 'react';
 import { InputGroup, Input, InputGroupAddon, Table, Badge, Button, Card, CardBody, CardHeader, Col, Container, Jumbotron, Row, Collapse, Fade, CardImg } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import axios from 'axios';
 
 class Account extends Component {
+  state = {
+    buyAmnt: '',
+    balance: 0,
+  }
+
+  handleChange = event => {
+    this.setState({ buyAmnt: event.target.value });
+  }
+
+  handleSubmit = event => {
+    event.preventDefault();
+
+    const purchase = {
+      buyAmnt: this.state.buyAmnt
+    };
+
+    console.log(user.buyAmnt)
+
+    axios.post('http://localhost:8000/balance', { purchase })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
+  }
+
+  componentDidMount() {
+    axios.get('http://localhost:8000/balance')
+    .then(res => {
+      const bal = res.data;
+      this.setState({balance: bal})
+    })
+  }
+
   render() {
     return (
       <div className="animated fadeIn">
@@ -13,7 +47,7 @@ class Account extends Component {
           </CardHeader>
           <CardBody>
 
-<Row>
+          <Row>
             <Col md={{ size: 4, offset: 2}}>
               <Card>
               <CardBody>
@@ -48,12 +82,12 @@ class Account extends Component {
                   <h3>Purchase more PRR</h3>
                   <hr className="my-2"/>
                   <p>$USD 1 = $PRR 2</p>
-                    <InputGroup>
+                    <InputGroup onChange={this.handleChange}>
                       <Input placeholder="How many $PRR" />
                       <InputGroupAddon addonType="append">$PRR</InputGroupAddon>
                     </InputGroup>
                     <br />
-                  <Button color="success">BUY NOW</Button>
+                  <Button onClick={this.handleSubmit} color="success">BUY NOW</Button>
                 </CardBody>
                 </Card>
               </Col>
@@ -61,6 +95,7 @@ class Account extends Component {
           </Row>
             <Row>
               <Col md={{ size: 8, offset: 2}}>
+              <Card>
               <CardHeader>
                 <h3><strong>Recent Transactions</strong></h3>
               </CardHeader>
@@ -119,6 +154,7 @@ class Account extends Component {
                 </Table>
 
               </CardBody>
+              </Card>
               </Col>
             </Row>
           </CardBody>

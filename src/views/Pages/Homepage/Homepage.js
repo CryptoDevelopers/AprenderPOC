@@ -53,7 +53,7 @@ class Homepage extends Component {
           <Card>
             <CardImg top width="100%" src="/assets/img/python.jpeg" alt="Card image cap" />
             <CardHeader>
-              Applied Data Science with Python Specialization
+              <strong>Applied Data Science with Python Specialization</strong>
             </CardHeader>
             <CardBody>
             The 5 courses in this University of Michigan specialization introduce learners to data science through the python
@@ -70,9 +70,9 @@ insight into their data.
         </Col>
         <Col xs="12" sm="6" md="3">
           <Card>
-            <CardImg top width="100%" src="/assets/img/home.jpeg" alt="Card image cap" />
+            <CardImg top width="100%" src="/assets/img/react.jpg" alt="Card image cap" />
             <CardHeader>
-              Cómo autoconstruir tu vivienda
+              <strong>React Basics</strong>
             </CardHeader>
             <CardBody>
               Learn front-end and hybrid mobile development, with server-side support, for implementing a multi-platform solution. The first two courses in this Specialization cover front-end frameworks: Bootstrap 4 and React. You’ll also learn to create hybrid mobile applications, using React Native. On the server side, you’ll learn to implement NoSQL databases using MongoDB, work within a Node.js environment and Express framework, and communicate to the client side through a RESTful API.
@@ -87,7 +87,7 @@ insight into their data.
           <Card>
             <CardImg top width="100%" src="/assets/img/blockchain.jpeg" alt="Card image cap" />
             <CardHeader>
-              Blockchain Specialization
+              <strong>Blockchain Specialization</strong>
             </CardHeader>
             <CardBody>
               This specialization introduces blockchain, a revolutionary technology that enables peer-to-peer transfer of digital assets without any intermediaries, and is predicted to be just as impactful as the Internet. More specifically, it prepares learners to program on the Ethereum blockchain. The four courses provide learners with (i) an understanding and working knowledge of foundational blockchain concepts, (ii) a skill set for designing and implementing smart contracts, (iii) methods for developing decentralized applications on the blockchain, and (iv) information about the ongoing specific industry-wide blockchain frameworks.
@@ -108,7 +108,7 @@ insight into their data.
               </CardHeader>
               <Collapse isOpen={this.state.collapse} id="collapseExample">
                 <CardBody>
-                  Master strategic marketing concepts and tools to address brand communication in a digital world.
+                  <strong>Master strategic marketing concepts and tools to address brand communication in a digital world.</strong>
                   <br />
                   <div className='text-center'>
                   <Button href="#/videos" color="primary">Purchase</Button>

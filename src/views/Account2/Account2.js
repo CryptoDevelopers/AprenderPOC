@@ -61,6 +61,7 @@ class Account extends Component {
           </Row>
             <Row>
               <Col md={{ size: 8, offset: 2}}>
+              <Card>
               <CardHeader>
                 <h3><strong>Recent Transactions</strong></h3>
               </CardHeader>
@@ -119,6 +120,7 @@ class Account extends Component {
                 </Table>
 
               </CardBody>
+              </Card>
               </Col>
             </Row>
           </CardBody>
