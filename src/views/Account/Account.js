@@ -7,6 +7,7 @@ class Account extends Component {
   state = {
     buyAmnt: '',
     balance: 0,
+    transactions: []
   }
 
   handleChange = event => {
@@ -46,6 +47,19 @@ class Account extends Component {
 
   }
 
+  getLedger = event => {
+    const user = {
+      user_ids: 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
+    };
+
+    axios.get('http://localhost:800/ledger')
+    .then(res => {
+      console.log(res);
+      const trans = res.data;
+      this.setState({transactions: trans})
+    })
+  }
+
   render() {
     return (
       <div className="animated fadeIn">
@@ -81,7 +95,7 @@ class Account extends Component {
                   <h3>PRR balance</h3>
                   <hr className="my-2"/>
                   <h4>$PRR {this.state.balance}</h4>
-                  <Button onClick={this.getBalance} color="primary">Refresh</Button>
+                  <Button onClick={this.getBalance, this.getLedger} color="primary">Refresh</Button>
                 </CardBody>
                 </Card>
               </Col>
