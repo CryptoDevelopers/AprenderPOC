@@ -29,9 +29,11 @@ import Widgets from './Widgets';
 import Upload from './Upload';
 import Video from './Video';
 import Account from './Account';
+import Account2 from './Account2';
 
 export {
   Account,
+  Account2,
   Upload,
   Video,
   Badges,

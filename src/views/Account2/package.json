@@ -1,0 +1,6 @@
+{
+  "name": "Account2",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Account2.js"
+}
