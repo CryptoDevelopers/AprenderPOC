@@ -21,6 +21,7 @@ const airdropService = ostObj.services.airdrops;
 const actionService = ostObj.services.actions;
 const transactionService = ostObj.services.transactions;
 const balanceService = ostObj.services.balances;
+const ledgerService = ostObj.services.ledger;
 
 app.use(bodyParser.json());
 app.listen(8000, () => {
@@ -185,17 +186,26 @@ app.route('/users/:username').get((req, res) => {
 
 
 app.route('/balances').get((req, res) => {
-
     balanceService.get({ id: user24 }).then(function (result) {
         const balance = result.data.balance.available_balance;
-        // console.log(result);
-        
+        // console.log(balance);
         return res.status(200).send(balance);
     }).catch(function (err) {
         console.log(err);
         return res.status(400).send();
     });
+});
 
+app.route('/ledger').get((req, res) => {
+    ledgerService.get({ id: user24 }).then(function (result) {
+        const ledger = result.data.transactions;
+        const obj = {"ledger":ledger};
+        // console.log(obj);
+        return res.status(200).send(obj);
+    }).catch(function (err) {
+        console.log(err);
+        return res.status(400).send();
+    });
 });
 
 
