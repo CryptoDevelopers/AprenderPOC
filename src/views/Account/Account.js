@@ -39,7 +39,8 @@ class Account extends Component {
     axios.get('http://localhost:8000/balances')
     .then(res => {
       console.log("YEYEEEEEEEE");
-      const bal = 2;//res.data;
+      console.log(res);
+      const bal = res.data;
       this.setState({balance: bal})
     })
 
@@ -79,7 +80,7 @@ class Account extends Component {
                 <CardBody>
                   <h3>PRR balance</h3>
                   <hr className="my-2"/>
-                  <h4>$PRR 69.99</h4>
+                  <h4>$PRR {this.state.balance}</h4>
                   <Button onClick={this.getBalance} color="primary">Refresh</Button>
                 </CardBody>
                 </Card>
