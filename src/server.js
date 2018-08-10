@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const bodyParser = require('body-parser');
 const pg = require('pg');
@@ -6,9 +7,9 @@ const connectionString = 'postgresql://ost:' + password + '@ost-poc.cmsffmdasle7
 const app = express();
 
 OSTSDK = require('@ostdotcom/ost-sdk-js');
-apiEndpoint = 'https://sandboxapi.ost.com/v1/';
-api_key = ''; // DON'T PLACE INTO GITHUB
-api_secret = ''; // DON'T PLACE INTO GITHUB
+apiEndpoint = 'https://sandboxapi.ost.com/v1.1/';
+const api_key = process.env.KEY;
+const api_secret = process.env.SECRET;
 const ostObj = new OSTSDK({ apiKey: api_key, apiSecret: api_secret, apiEndpoint: apiEndpoint });
 const userService = ostObj.services.users;
 const airdropService = ostObj.services.airdrops;
@@ -229,19 +230,25 @@ app.route('/users/:username').get((req, res) => {
 });
 
 app.route('/airdrop').post((req, res) => {
-    console.log('\nairdropping...');
+    console.log('\nairdropping ' + req.body.amount + ' to user ' + req.body.user_ids);
     // const data = { username: req.body.amount };
-    airdropService.execute({ amount: req.body.amount, user_ids: req.body.user_id })
+
+    airdropService.execute({
+        amount: req.body.amount,
+        user_ids: req.body.user_id
+    })
         .then(function (res) {
-        console.log("Air drop initiated:\n" + JSON.stringify(res));
-        var id = res.data.airdrop.id;
-        // Check status of airdrop
-        airdropService.get({ id: id }).then(function (res) {
-            console.log("Air drop status:\n" + JSON.stringify(res));
-        }).catch(function (err) { console.log(JSON.stringify(err)); });
-    }).catch(function (err) {
-        console.log(JSON.stringify(err));
-    });
+            console.log("Air drop initiated:\n" + JSON.stringify(res));
+            var id = res.data.airdrop.id;
+            // Check status of airdrop
+            airdropService.get({ id: id }).then(function (res) {
+                console.log("Air drop status:\n" + JSON.stringify(res));
+            }).catch(function (err) { console.log(JSON.stringify(err)); });
+        }).catch(function (err) {
+            console.log("NOPE!");
+            console.log(JSON.stringify(err));
+            res.status(400).json({ success: false, data: err });
+        });
 });
 
 app.route('/users/delete/:username').delete((req, res) => {
