@@ -202,11 +202,17 @@ const Account = Loadable({
   loading: Loading,
 })
 
+const Account2 = Loadable({
+  loader: () => import('./views/Account2'),
+  loading: Loading,
+})
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home', component: DefaultLayout },
   { path: '/home', name: 'Homepage', component: Homepage },
-  { path: '/account', name: 'Account', component: Account },
+  { path: '/account81', name: 'Account', component: Account },
+  { path: '/account37', name: 'Account2', component: Account2 },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },

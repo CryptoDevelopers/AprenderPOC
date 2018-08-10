@@ -19,7 +19,7 @@ class Video extends Component {
     return (
         <Card className="card-vid">
           <CardHeader>
-            <strong>Lesson 1</strong>
+            <strong>ReactJS Basics - #1 What is React?</strong>
           </CardHeader>
           <CardBody>
               <YouTube
@@ -31,7 +31,7 @@ class Video extends Component {
           {/* <CardFooter> */}
             <Table hover responsive className="table-outline mb-0 d-none d-sm-table float-right">
                   {/* <thead className="thead-light">
-                 
+
                   </thead> */}
                     <tbody>
                   <tr>

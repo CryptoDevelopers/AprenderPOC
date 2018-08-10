@@ -20,11 +20,11 @@ class Account extends Component {
                 <h3>Profile</h3>
                 <hr className="my-2"/>
                 <h4>Name</h4>
-                <p>Mohammed Salah</p>
-                <h4>Email</h4>
-                <p>msalah@gmail.com</p>
-                <h4>Country</h4>
-                <p>Egypt</p>
+                  <p>Leonardo Bonucci</p>
+                  <h4>Email</h4>
+                  <p>leobon@gmail.com</p>
+                  <h4>Country</h4>
+                  <p>Italy</p>
                 <h4>Postal code</h4>
                 <p>22030</p>
                 <Button color="primary">Update Profile</Button>

@@ -16,7 +16,12 @@ export default {
     },
     {
       name: 'Account',
-      url: '/account',
+      url: '/account81',
+      icon: 'icon-user',
+    },
+    {
+      name: 'Account2',
+      url: '/account37',
       icon: 'icon-user',
     },
     {
