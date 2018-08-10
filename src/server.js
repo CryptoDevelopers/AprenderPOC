@@ -11,6 +11,7 @@ const crypto = require('crypto');
 const queryString = require('query-string');
 const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc';
 const user23 = 'fb28ad4e-e6c5-4215-9ae5-7b4f64bdd498';
+const user22 = '22c8081e-3ce3-436f-a334-8a65da0f50c7';
 const user10 = 'ae18c546-10cd-4580-b9b5-d858fcb14acd';
 
 OSTSDK = require('@ostdotcom/ost-sdk-js');
@@ -315,14 +316,16 @@ app.route('/course').get((req, res) => {
     console.log('\nPurchasing course...');
     
     const action_id = '39298'
-    console.log("Student's user_id: " + user24)
+    console.log("Student's user_id: " + user22)
     console.log("Course creator's user_id: " + user10)
-    transactionService.execute({ from_user_id: user24, to_user_id: user10, action_id: action_id }).then(function (res) {
+    transactionService.execute({ from_user_id: user22, to_user_id: user10, action_id: action_id }).then(function (result) {
         console.log("\nCourse purchased: React Basics" );
-        console.log("\ntransactionService res:");
-        console.log( res);
+        console.log("\ntransactionService success! Data:");
+        console.log( result.data);
+        return res.status(200).send("Course purchased!");
     }).catch(function (err) {
         console.log(JSON.stringify(err));
+        return res.status(400).send("Course purchase error");
     });
 });
 
