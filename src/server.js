@@ -82,74 +82,23 @@ app.route('/api/jobs/:job_id').get((req, res) => {
     });
 });
 
-app.route('/api/jobs/new').post((req, res) => {
-    console.log('\nPosting new job...');
+app.route('/video').post((req, res) => {
+    console.log('\nPosting new video...');
     // Grab data from http request
-    const data = { title: req.body.title, description: req.body.description, skills: req.body.skills, pay: req.body.pay, date_posted: req.body.date_posted, username: req.body.username };
+    const data = { title: req.body.title, description: req.body.description };
 
-    // Get a Postgres client from the connection pool
-    pg.connect(connectionString, (err, client, done) => {
-        // Handle connection errors
-        if (err) {
-            done();
-            console.log(err);
-            return res.status(500).json({ success: false, data: err });
-        }
-        // SQL Query > Select Data
-        const query = client.query("SELECT users.user_id FROM users WHERE username = '" + data.username + "'", function (err, result) {
-            if (err) {
-                console.log(err);
-                return res.status(400).send(err.detail)
-            }
-        });
-        // Stream results back one row at a time
-        query.on('row', (row) => {
-            poster = JSON.parse(JSON.stringify(row)).user_id;
-        });
-        // After all data is returned, close connection and return results
-        query.on('end', () => {
-            done();
+    // Transfer tokens from poster to company
+    const action_id = '39302' // Upload vid action
+    const company_id = '1c4dcbc4-6f17-4bbc-9891-0a0322aae65b'
+    const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
 
-            // Get a Postgres client from the connection pool
-            pg.connect(connectionString, (err, client, done) => {
-                // Handle connection errors
-                if (err) {
-                    done();
-                    console.log(err);
-                    return res.status(500).json({ success: false, data: err });
-                }
-
-                // SQL Query > Insert Data
-                const query = client.query('INSERT INTO jobs(title, description, skills, pay, date_posted, username) values($1, $2, $3, $4, $5, $6)', [data.title, data.description, data.skills, data.pay, data.date_posted, data.username], function (err, result) {
-                    if (err) {
-                        return res.status(400).send(err.detail)
-                    }
-                });
-                // Close connection
-                query.on('end', () => {
-                    done();
-                    console.log("Job posted")
-                    return res.status(200).send("Job posted")
-                });
-            });
-
-            // Transfer tokens from poster to company
-            const action_id = '33836' //(Post job action)
-            const company_id = '8bf37bf1-a11a-454c-abc3-e2e338ffe745'
-            console.log("Poster's user_id: " + JSON.stringify(poster))
-            console.log("Company's id: " + JSON.stringify(company_id))
-            transactionService.execute({ from_user_id: poster, to_user_id: company_id, action_id: action_id }).then(function (res) {
-                console.log("Post job funds transfer initiated: \n" + JSON.stringify(res));
-                var transaction_id = res.data.transaction.id
-                console.log("transaction_id:" + JSON.stringify(transaction_id));
-            }).catch(function (err) {
-                console.log(JSON.stringify(err));
-            });
-        });
+    transactionService.execute({ from_user_id: user24, to_user_id: company_id, action_id: action_id }).then(function (res) {
+        console.log("Upload vid transfer initiated: \n" + JSON.stringify(res));
+        var transaction_id = res.data.transaction.id
+        console.log("transaction_id:" + JSON.stringify(transaction_id));
+    }).catch(function (err) {
+        console.log(JSON.stringify(err));
     });
-
-
-
 });
 
 app.route('/api/jobs/delete/:job_id').delete((req, res) => {
@@ -235,7 +184,7 @@ app.route('/airdrop').post((req, res) => {
 
     airdropService.execute({
         amount: req.body.amount,
-        user_ids: req.body.user_id
+        user_id: req.body.user_id
     })
         .then(function (res) {
             console.log("Air drop initiated:\n" + JSON.stringify(res));
@@ -243,11 +192,13 @@ app.route('/airdrop').post((req, res) => {
             // Check status of airdrop
             airdropService.get({ id: id }).then(function (res) {
                 console.log("Air drop status:\n" + JSON.stringify(res));
-            }).catch(function (err) { console.log(JSON.stringify(err)); });
+            }).catch(function (err) {
+                console.log(JSON.stringify(err));
+            });
         }).catch(function (err) {
             console.log("NOPE!");
             console.log(JSON.stringify(err));
-            res.status(400).json({ success: false, data: err });
+            return res.status(400).json({ success: false, data: err });
         });
 });
 
