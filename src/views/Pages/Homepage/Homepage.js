@@ -95,7 +95,7 @@ class Homepage extends Component {
                 Learn front-end and hybrid mobile development, with server-side support, for implementing a multi-platform solution. The first two courses in this Specialization cover front-end frameworks: Bootstrap 4 and React. You’ll also learn to create hybrid mobile applications, using React Native. On the server side, you’ll learn to implement NoSQL databases using MongoDB, work within a Node.js environment and Express framework, and communicate to the client side through a RESTful API.
             <br />
                 <div className='text-center'>
-                  <Button onClick={this.purchaseCourse} color="primary">Purchase</Button>
+                  <Button href="#/videos" onClick={this.purchaseCourse} color="primary">Purchase</Button>
                 </div>
               </CardBody>
             </Card>
@@ -121,11 +121,11 @@ class Homepage extends Component {
                 <CardImg top width="100%" src="/assets/img/digmarketing.png" alt="Card image cap" />
 
                 <CardHeader onClick={this.toggle}>
-                  Digital Marketing Specialization
+                <strong>Digital Marketing Specialization</strong>
               </CardHeader>
                 <Collapse isOpen={this.state.collapse} id="collapseExample">
                   <CardBody>
-                    <strong>Master strategic marketing concepts and tools to address brand communication in a digital world.</strong>
+                    Master strategic marketing concepts and tools to address brand communication in a digital world.
                     <br />
                     <div className='text-center'>
                       <Button onClick={this.purchaseCourse} color="primary">Purchase</Button>

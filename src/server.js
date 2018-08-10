@@ -12,6 +12,7 @@ const queryString = require('query-string');
 const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc';
 const user23 = 'fb28ad4e-e6c5-4215-9ae5-7b4f64bdd498';
 const user22 = '22c8081e-3ce3-436f-a334-8a65da0f50c7';
+const user17 = 'cd9421d9-9da9-48b9-8e16-0f5817e9d1c8';
 const user10 = 'ae18c546-10cd-4580-b9b5-d858fcb14acd';
 
 OSTSDK = require('@ostdotcom/ost-sdk-js');
@@ -99,7 +100,7 @@ app.route('/video').post((req, res) => {
     console.log('\nPosting new video...');
     console.log('\nvid title: ' + data.title);
 
-    transactionService.execute({ from_user_id: user23, to_user_id: company_id, action_id: vid_action_id }).then(function (res) {
+    transactionService.execute({ from_user_id: user10, to_user_id: company_id, action_id: vid_action_id }).then(function (res) {
         console.log("Upload vid transfer initiated: \n" + JSON.stringify(res));
         var transaction_id = res.data.transaction.id
         console.log("transaction_id:" + JSON.stringify(transaction_id));
@@ -187,7 +188,7 @@ app.route('/users/:username').get((req, res) => {
 
 
 app.route('/balances').get((req, res) => {
-    balanceService.get({ id: user24 }).then(function (result) {
+    balanceService.get({ id: user10 }).then(function (result) {
         const balance = result.data.balance.available_balance;
         // console.log(balance);
         return res.status(200).send(balance);
@@ -198,7 +199,7 @@ app.route('/balances').get((req, res) => {
 });
 
 app.route('/ledger').get((req, res) => {
-    ledgerService.get({ id: user24 }).then(function (result) {
+    ledgerService.get({ id: user10 }).then(function (result) {
         const ledger = result.data.transactions;
         const obj = { "ledger": ledger };
         // console.log(obj);
@@ -216,7 +217,7 @@ app.route('/airdrop').post((req, res) => {
 
     airdropService.execute({
         amount: req.body.amount,
-        user_id: req.body.user_id
+        user_id: user17
     })
         .then(function (res) {
             console.log("Air drop initiated:\n" + JSON.stringify(res));
@@ -316,9 +317,9 @@ app.route('/course').get((req, res) => {
     console.log('\nPurchasing course...');
     
     const action_id = '39298'
-    console.log("Student's user_id: " + user22)
+    console.log("Student's user_id: " + user17)
     console.log("Course creator's user_id: " + user10)
-    transactionService.execute({ from_user_id: user22, to_user_id: user10, action_id: action_id }).then(function (result) {
+    transactionService.execute({ from_user_id: user17, to_user_id: user10, action_id: action_id }).then(function (result) {
         console.log("\nCourse purchased: React Basics" );
         console.log("\ntransactionService success! Data:");
         console.log( result.data);

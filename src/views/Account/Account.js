@@ -62,10 +62,10 @@ class Account extends Component {
         ledgers.forEach(function (ledj) {
           rows.push(
             <tr>
-              <td>{ledj.id}</td>
               <td>{ledj.amount}</td>
+              <td>{ledj.to_user_id}</td>
               <td>{ledj.from_user_id}</td>
-              <td>{ledj.from_user_id}</td>
+              <td>{ledj.id}</td> 
             </tr >
           );
         }.bind(this));
@@ -107,7 +107,7 @@ class Account extends Component {
                 <Col>
                   <Card className="text-center">
                     <CardBody>
-                      <h3>PRR balance</h3>
+                      <h3>My PRR Balance</h3>
                       <hr className="my-2" />
                       <h4>$PRR {this.state.balance}</h4>
                       <Button onClick={this.getBalance} color="primary">Refresh</Button>
@@ -132,7 +132,7 @@ class Account extends Component {
               </Col>
             </Row>
             <Row>
-              <Col md={{ size: 8, offset: 2 }}>
+              <Col>
                 <Card>
                   <CardHeader>
                     <h3><strong>Recent Transactions</strong></h3>
@@ -146,7 +146,7 @@ class Account extends Component {
                           <th>Amount</th>
                           <th>To User ID</th>
                           <th>From User ID</th>
-                          <th>Status</th>
+                          <th>Transaction ID</th>
                         </tr>
                       </thead>
                       
