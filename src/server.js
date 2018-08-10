@@ -9,7 +9,7 @@ const app = express();
 const request = require('request');
 const crypto = require('crypto');
 const queryString = require('query-string');
-
+const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
 
 OSTSDK = require('@ostdotcom/ost-sdk-js');
 const apiEndpoint = 'https://sandboxapi.ost.com/v1.1/';
@@ -20,6 +20,7 @@ const userService = ostObj.services.users;
 const airdropService = ostObj.services.airdrops;
 const actionService = ostObj.services.actions;
 const transactionService = ostObj.services.transactions;
+const balanceService = ostObj.services.balances;
 
 app.use(bodyParser.json());
 app.listen(8000, () => {
@@ -95,7 +96,6 @@ app.route('/video').post((req, res) => {
     // Transfer tokens from poster to company
     const action_id = '39302' // Upload vid action
     const company_id = '1c4dcbc4-6f17-4bbc-9891-0a0322aae65b'
-    const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
 
     transactionService.execute({ from_user_id: user24, to_user_id: company_id, action_id: action_id }).then(function (res) {
         console.log("Upload vid transfer initiated: \n" + JSON.stringify(res));
@@ -183,49 +183,18 @@ app.route('/users/:username').get((req, res) => {
     });
 });
 
-function generateQueryString(inputParams) {
-    const queryParamsString = queryString.stringify(inputParams, { arrayFormat: 'bracket' }).replace(/%20/g, '+');
-    const stringToSign = apiEndpoint + 'balances/b0851935-b08d-4027-ae33-ed35fe6ac0dc' + '?' + queryParamsString;
-    console.log("stringToSign");
-    console.log(stringToSign);
-    return stringToSign;
-}
-function createTimeString() {
-    var d = new Date();
-    var t = d.getTime();
-    var o = t + "";
-    return o.substring(0, 10);
-}
-function generateApiSignature(stringToSign) {
-    var buff = new Buffer.from(api_secret, 'utf8');
-    var hmac = crypto.createHmac('sha256', buff);
-    hmac.update(stringToSign);
-    return hmac.digest('hex');
-}
 
 app.route('/balances').get((req, res) => {
-    // console.log('\nuser: ' + req.body.user_ids);
-    const user_id = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'; //req.params['user_id'];
 
-    var requestParams = { api_key: api_key, request_timestamp: createTimeString() };
-    var stringToSign = generateQueryString(requestParams);
-    // string-to-sign = "/balances/b0851935-b08d-4027-ae33-ed35fe6ac0dc?api_key="+api_key+"&request_timestamp="+Date.now()+"&"
-    
-    const endpoint = stringToSign + '&signature=' + generateApiSignature(stringToSign);
-    console.log(endpoint);
-    request.get(
-        endpoint,
-        function (error, response, body) {
-            console.log(body);
-            if (!error && response.statusCode == 200) {
-                console.log("Success! Body:");
-                console.log(body);
-            } else {
-                console.log("Error:");
-                console.log(error);
-            }
-        }
-    );
+    balanceService.get({ id: user24 }).then(function (result) {
+        const balance = result.data.balance.available_balance;
+        // console.log(result);
+        
+        return res.status(200).send(balance);
+    }).catch(function (err) {
+        console.log(err);
+        return res.status(400).send();
+    });
 
 });
 

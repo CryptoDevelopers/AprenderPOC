@@ -38,7 +38,8 @@ class Account extends Component {
 
     axios.get('http://localhost:8000/balances')
     .then(res => {
-      const bal = res.data;
+      console.log("YEYEEEEEEEE");
+      const bal = 2;//res.data;
       this.setState({balance: bal})
     })
 
