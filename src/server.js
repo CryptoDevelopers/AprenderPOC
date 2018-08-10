@@ -9,7 +9,9 @@ const app = express();
 const request = require('request');
 const crypto = require('crypto');
 const queryString = require('query-string');
-const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'
+const user24 = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc';
+const user23 = 'fb28ad4e-e6c5-4215-9ae5-7b4f64bdd498';
+const user10 = 'ae18c546-10cd-4580-b9b5-d858fcb14acd';
 
 OSTSDK = require('@ostdotcom/ost-sdk-js');
 const apiEndpoint = 'https://sandboxapi.ost.com/v1.1/';
@@ -90,15 +92,13 @@ app.route('/api/jobs/:job_id').get((req, res) => {
 });
 
 app.route('/video').post((req, res) => {
-    console.log('\nPosting new video...');
-    // Grab data from http request
     const data = { title: req.body.title, description: req.body.description };
-
-    // Transfer tokens from poster to company
-    const action_id = '39302' // Upload vid action
+    const vid_action_id = '39302' // Upload vid action
     const company_id = '1c4dcbc4-6f17-4bbc-9891-0a0322aae65b'
+    console.log('\nPosting new video...');
+    console.log('\nvid title: ' + data.title);
 
-    transactionService.execute({ from_user_id: user24, to_user_id: company_id, action_id: action_id }).then(function (res) {
+    transactionService.execute({ from_user_id: user23, to_user_id: company_id, action_id: vid_action_id }).then(function (res) {
         console.log("Upload vid transfer initiated: \n" + JSON.stringify(res));
         var transaction_id = res.data.transaction.id
         console.log("transaction_id:" + JSON.stringify(transaction_id));
@@ -199,7 +199,7 @@ app.route('/balances').get((req, res) => {
 app.route('/ledger').get((req, res) => {
     ledgerService.get({ id: user24 }).then(function (result) {
         const ledger = result.data.transactions;
-        const obj = {"ledger":ledger};
+        const obj = { "ledger": ledger };
         // console.log(obj);
         return res.status(200).send(obj);
     }).catch(function (err) {
@@ -311,99 +311,21 @@ app.route('/applications/:application_id').get((req, res) => {
     });
 });
 
-app.route('/applications/new').post((req, res) => {
-    console.log('\nCreating new application...');
-    var applicator = '';
-    var poster = '';
-
-    // Grab data from http request
-    const data = { job_id: req.body.job_id, username: req.body.username, date_applied: req.body.date_applied, message: req.body.message };
-
-    // Get a Postgres client from the connection pool
-    pg.connect(connectionString, (err, client, done) => {
-        // Handle connection errors
-        if (err) {
-            done();
-            console.log(err);
-            return res.status(500).json({ success: false, data: err });
-        }
-        // SQL Query > Select Data
-        const query = client.query("SELECT user_id FROM users WHERE username = '" + data.username + "'", function (err, result) {
-            if (err) {
-                console.log(err);
-                return res.status(400).send(err.detail)
-            }
-        });
-        // Stream results back one row at a time
-        query.on('row', (row) => {
-            // console.log(row)
-            applicator = JSON.parse(JSON.stringify(row)).user_id;
-        });
-        // After all data is returned, close connection and return results
-        query.on('end', () => {
-            done();
-            // Get a Postgres client from the connection pool
-            pg.connect(connectionString, (err, client, done) => {
-                // Handle connection errors
-                if (err) {
-                    done();
-                    console.log(err);
-                    return res.status(500).json({ success: false, data: err });
-                }
-                // SQL Query > Select Data
-                const query = client.query("SELECT users.user_id FROM jobs LEFT OUTER JOIN users ON jobs.username = users.username WHERE job_id = " + data.job_id, function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        return res.status(400).send(err.detail)
-                    }
-                });
-                // Stream results back one row at a time
-                query.on('row', (row) => {
-                    // console.log(row)
-                    poster = JSON.parse(JSON.stringify(row)).user_id;
-                });
-                // After all data is returned, close connection and return results
-                query.on('end', () => {
-                    done();
-
-                    // Insert record into application table
-                    pg.connect(connectionString, (err, client, done) => {
-                        // Handle connection errors
-                        if (err) {
-                            done();
-                            console.log(err);
-                            return res.status(500).json({ success: false, data: err });
-                        }
-
-                        // SQL Query > Insert Data
-                        const query = client.query('INSERT INTO applications(job_id, username, date_applied, message) values($1, $2, $3, $4)', [data.job_id, data.username, data.date_applied, data.message], function (err, result) {
-                            if (err) {
-                                return res.status(400).send(err.detail)
-                            }
-                        });
-                        // Close connection
-                        query.on('end', () => {
-                            done();
-                            return res.status(200).send("Application recorded")
-                        });
-                    });
-
-                    // Transfer tokens from applicator to poster
-                    const action_id = '33853' //(Apply job action)
-                    console.log("Poster's user_id: " + JSON.stringify(poster))
-                    console.log("Applicator's user_id: " + JSON.stringify(applicator))
-                    transactionService.execute({ from_user_id: applicator, to_user_id: poster, action_id: action_id }).then(function (res) {
-                        console.log("Apply job funds transfer initiated: \n" + JSON.stringify(res));
-                        var transaction_id = res.data.transaction.id
-                        console.log("Transaction_id:" + JSON.stringify(transaction_id));
-                    }).catch(function (err) {
-                        console.log(JSON.stringify(err));
-                    });
-                });
-            });
-        });
+app.route('/course').get((req, res) => {
+    console.log('\nPurchasing course...');
+    
+    const action_id = '39298'
+    console.log("Student's user_id: " + user24)
+    console.log("Course creator's user_id: " + user10)
+    transactionService.execute({ from_user_id: user24, to_user_id: user10, action_id: action_id }).then(function (res) {
+        console.log("\nCourse purchased: React Basics" );
+        console.log("\ntransactionService res:");
+        console.log( res);
+    }).catch(function (err) {
+        console.log(JSON.stringify(err));
     });
 });
+
 
 // Login Authentification
 app.route('/login').post((req, res) => {
