@@ -1,0 +1,494 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const pg = require('pg');
+const password = ''; //REDACTED for GITHUB
+const connectionString = 'postgresql://ost:' + password + '@ost-poc.cmsffmdasle7.us-east-1.rds.amazonaws.com:5432/ost';
+const app = express();
+
+OSTSDK = require('@ostdotcom/ost-sdk-js');
+apiEndpoint = 'https://sandboxapi.ost.com/v1/';
+api_key = ''; // DON'T PLACE INTO GITHUB
+api_secret = ''; // DON'T PLACE INTO GITHUB
+const ostObj = new OSTSDK({apiKey: api_key, apiSecret: api_secret, apiEndpoint: apiEndpoint});
+const userService = ostObj.services.users;
+const airdropService = ostObj.services.airdrops;
+const actionService = ostObj.services.actions;
+const transactionService = ostObj.services.transactions;
+
+app.use(bodyParser.json());
+app.listen(8000, () => {
+	console.log('\n********************* Server started! *********************');
+});
+
+// JOBS ----------------------------------------------------------------------
+app.route('/api/jobs/all').get((req, res) => {
+	console.log('\nGetting all jobs...');
+	const results = [];
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query('SELECT * FROM jobs ORDER BY date_posted DESC;');
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row);
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+			return res.json(results);
+		});
+	});
+});
+
+app.route('/api/jobs/:job_id').get((req, res) => {
+	const requestedJob = req.params['job_id']
+	console.log('\nGetting job ' + requestedJob + '...');
+	const results = [];
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query('SELECT * FROM jobs WHERE job_id = '.concat(requestedJob), function (err, result) {
+			if (err) {
+				return res.status(400).send(err.detail)
+			}
+		});
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row);
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+			if (results.length == 0) {
+				return res.status(400).send("Job doesn't exist")
+			}
+			else {
+				return res.json(results);
+			}
+		});
+	});
+});
+
+app.route('/api/jobs/new').post((req, res) => {
+	console.log('\nPosting new job...');
+	// Grab data from http request
+  const data = {title: req.body.title, description: req.body.description, skills: req.body.skills, pay: req.body.pay, date_posted: req.body.date_posted, username: req.body.username};
+
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query("SELECT users.user_id FROM users WHERE username = '" + data.username + "'", function (err, result) {
+			if (err) {
+				console.log(err);
+				return res.status(400).send(err.detail)
+			}
+		});
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			poster = JSON.parse(JSON.stringify(row)).user_id;
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+
+			// Get a Postgres client from the connection pool
+			pg.connect(connectionString, (err, client, done) => {
+				// Handle connection errors
+				if(err) {
+					done();
+					console.log(err);
+					return res.status(500).json({success: false, data: err});
+				}
+
+				// SQL Query > Insert Data
+				const query = client.query('INSERT INTO jobs(title, description, skills, pay, date_posted, username) values($1, $2, $3, $4, $5, $6)', [data.title, data.description, data.skills, data.pay, data.date_posted, data.username], function (err, result) {
+					if (err) {
+						return res.status(400).send(err.detail)
+					}
+				});
+				// Close connection
+				query.on('end', () => {
+					done();
+					console.log("Job posted")
+					return res.status(200).send("Job posted")
+				});
+			});
+
+			// Transfer tokens from poster to company
+			const action_id = '33836' //(Post job action)
+			const company_id = '8bf37bf1-a11a-454c-abc3-e2e338ffe745'
+			console.log("Poster's user_id: " + JSON.stringify(poster))
+			console.log("Company's id: " + JSON.stringify(company_id))
+			transactionService.execute({from_user_id: poster, to_user_id: company_id, action_id: action_id}).then(function(res) {
+				console.log("Post job funds transfer initiated: \n" + JSON.stringify(res));
+				var transaction_id = res.data.transaction.id
+				console.log("transaction_id:" + JSON.stringify(transaction_id));
+			}).catch(function(err) {
+				console.log(JSON.stringify(err));
+			});
+		});
+	});
+
+
+
+});
+
+app.route('/api/jobs/delete/:job_id').delete((req, res) => {
+	const requestedJob = req.params['job_id'];
+	console.log('\nDeleting job ' + requestedJob + "...");
+	const results = [];
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// Check to see if job exists
+		const query = client.query('SELECT * FROM jobs WHERE job_id = '.concat(requestedJob), function (err, result) {
+			if (err) {
+				return res.status(400).send(err.detail)
+			}
+		});
+
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row);
+		});
+
+		// Close connection
+		query.on('end', () => {
+			done();
+			if (results.length == 0) {
+				return res.status(400).send("Job " + requestedJob + " doesn't exist")
+			}
+			else{
+				// SQL Query > Delete Data
+				client.query('DELETE FROM jobs WHERE job_id = '.concat(requestedJob));
+				console.log("Job deleted")
+				return res.status(200).send("Job " + requestedJob + " deleted")
+			}
+		});
+	});
+});
+
+// USERS ----------------------------------------------------------------------
+app.route('/users/:username').get((req, res) => {
+	const requestedUser = req.params['username'];
+	console.log('\nGetting user ' + requestedUser + '...');
+	const results = [];
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query("SELECT * FROM users WHERE username = '" + requestedUser + "'" , function (err, result) {
+			if (err) {
+				console.log(err);
+				return res.status(400).send(err.detail)
+			}
+		});
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row);
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+			if (results.length == 0) {
+				return res.status(400).send("User doesn't exist")
+			}
+			else {
+				return res.json(results);
+			}
+		});
+	});
+});
+
+app.route('/users/new').post((req, res) => {
+	console.log('\nCreating new user...');
+	// Grab data from http request
+  const data = {username: req.body.username, password: req.body.password, first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, linkedin_url: req.body.linkedin_url, skills: req.body.skills};
+
+	var apiResponse = userService.create({name: data.username}).then(function(a) {
+		console.log(JSON.stringify(a));
+		console.log("User created");
+		var user_id = a.data.user.id;
+		console.log("user_id: " + user_id);
+		// Get a Postgres client from the connection pool
+		pg.connect(connectionString, (err, client, done) => {
+			// Handle connection errors
+			if(err) {
+				done();
+				console.log(err);
+				return res.status(500).json({success: false, data: err});
+			}
+
+			// SQL Query > Insert Data
+			const query = client.query('INSERT INTO users(user_id, username, password, first_name, last_name, email, linkedin_url, skills) values($1, $2, $3, $4, $5, $6, $7, $8)', [user_id, data.username, data.password, data.first_name, data.last_name, data.email, data.linkedin_url, req.body.skills], function (err, result) {
+				if (err) {
+					return res.status(400).send(err.detail)
+				}
+				else{
+					return res.status(201).send(req.body)
+				}
+			});
+			// Close connection
+			query.on('end', () => {
+				done();
+			});
+		});
+
+		// Airdrop 1 token to new user
+		airdropService.execute({amount: 10, user_ids: user_id}).then(function(res) {
+			console.log("Air drop initiated:\n" + JSON.stringify(res));
+			var id = res.data.airdrop.id;
+			// Check status of airdrop
+			airdropService.get({id: id}).then(function(res) {
+				console.log("Air drop status:\n" + JSON.stringify(res));
+			}).catch(function(err) { console.log(JSON.stringify(err)); });
+		}).catch(function(err) {
+			console.log(JSON.stringify(err));
+		});
+
+	}).catch(function(error) {
+		console.log(error)
+	});
+});
+
+app.route('/users/delete/:username').delete((req, res) => {
+	const requestedUser = req.params['username'];
+	console.log('\nDeleting user ' + requestedUser + '...');
+	const results = [];
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// Check to see if user exists
+		const query = client.query("SELECT * FROM users WHERE username = '" + requestedUser + "'", function (err, result) {
+			if (err) {
+				return res.status(400).send(err.detail)
+			}
+		});
+
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row);
+		});
+
+		// Close connection
+		query.on('end', () => {
+			done();
+			if (results.length == 0) {
+				return res.status(400).send("User " + requestedUser + " doesn't exist")
+			}
+			else{
+				// SQL Query > Delete Data
+				client.query("DELETE FROM users WHERE username = '" + requestedUser + "'");
+				console.log(requestedUser + 'deleted');
+				return res.status(200).send("User " + requestedUser + " deleted")
+			}
+		});
+	});
+});
+
+
+// APPLICATIONS ----------------------------------------------------------------------
+app.route('/applications/:application_id').get((req, res) => {
+	const requestedApplication = req.params['application_id'];
+	console.log('\nGetting application ' + requestedApplication + '...');
+	const results = [];
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query("SELECT * FROM applications WHERE application_id = " + requestedApplication, function (err, result) {
+			if (err) {
+				console.log(err);
+				return res.status(400).send(err.detail)
+			}
+		});
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row);
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+			if (results.length == 0) {
+				return res.status(400).send("Application doesn't exist")
+			}
+			else {
+				return res.json(results);
+			}
+		});
+	});
+});
+
+app.route('/applications/new').post((req, res) => {
+	console.log('\nCreating new application...');
+	var applicator = '';
+	var poster = '';
+
+	// Grab data from http request
+	const data = {job_id: req.body.job_id, username: req.body.username, date_applied: req.body.date_applied, message: req.body.message};
+
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query("SELECT user_id FROM users WHERE username = '" + data.username + "'", function (err, result) {
+			if (err) {
+				console.log(err);
+				return res.status(400).send(err.detail)
+			}
+		});
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			// console.log(row)
+			applicator = JSON.parse(JSON.stringify(row)).user_id;
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+			// Get a Postgres client from the connection pool
+			pg.connect(connectionString, (err, client, done) => {
+				// Handle connection errors
+				if(err) {
+					done();
+					console.log(err);
+					return res.status(500).json({success: false, data: err});
+				}
+				// SQL Query > Select Data
+				const query = client.query("SELECT users.user_id FROM jobs LEFT OUTER JOIN users ON jobs.username = users.username WHERE job_id = " + data.job_id, function (err, result) {
+					if (err) {
+						console.log(err);
+						return res.status(400).send(err.detail)
+					}
+				});
+				// Stream results back one row at a time
+				query.on('row', (row) => {
+					// console.log(row)
+					poster = JSON.parse(JSON.stringify(row)).user_id;
+				});
+				// After all data is returned, close connection and return results
+				query.on('end', () => {
+					done();
+
+					// Insert record into application table
+					pg.connect(connectionString, (err, client, done) => {
+						// Handle connection errors
+						if(err) {
+							done();
+							console.log(err);
+							return res.status(500).json({success: false, data: err});
+						}
+
+						// SQL Query > Insert Data
+						const query = client.query('INSERT INTO applications(job_id, username, date_applied, message) values($1, $2, $3, $4)', [data.job_id, data.username, data.date_applied, data.message], function (err, result) {
+							if (err) {
+								return res.status(400).send(err.detail)
+							}
+						});
+						// Close connection
+						query.on('end', () => {
+							done();
+							return res.status(200).send("Application recorded")
+						});
+					});
+
+					// Transfer tokens from applicator to poster
+					const action_id = '33853' //(Apply job action)
+					console.log("Poster's user_id: " + JSON.stringify(poster))
+					console.log("Applicator's user_id: " + JSON.stringify(applicator))
+					transactionService.execute({from_user_id: applicator, to_user_id: poster, action_id: action_id}).then(function(res) {
+						console.log("Apply job funds transfer initiated: \n" + JSON.stringify(res));
+						var transaction_id = res.data.transaction.id
+						console.log("Transaction_id:" + JSON.stringify(transaction_id));
+					}).catch(function(err) {
+						console.log(JSON.stringify(err));
+					});
+				});
+			});
+		});
+	});
+});
+
+// Login Authentification
+app.route('/login').post((req, res) => {
+	console.log('\nLogin authentification initiated...');
+	var results = [];
+
+	// Grab data from http request
+	const data = {username: req.body.username, password: req.body.password};
+
+	// Get a Postgres client from the connection pool
+	pg.connect(connectionString, (err, client, done) => {
+		// Handle connection errors
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		// SQL Query > Select Data
+		const query = client.query("SELECT * FROM users WHERE username = '" + data.username + "' AND password = '" + data.password + "'" , function (err, result) {
+			if (err) {
+				console.log(err);
+				return res.status(400).send(err.detail)
+			}
+		});
+		// Stream results back one row at a time
+		query.on('row', (row) => {
+			results.push(row)
+		});
+		// After all data is returned, close connection and return results
+		query.on('end', () => {
+			done();
+			if (results.length == 0) {
+				console.log('Login failed');
+				return res.status(400).send("False")
+			}
+			else {
+				console.log('Login success');
+				return res.status(200).send("True");
+			}
+		});
+	});
+});
