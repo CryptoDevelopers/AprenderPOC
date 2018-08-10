@@ -7,6 +7,9 @@ package-lock.json
 # testing
 /coverage
 
+#style.css
+src/scss/style.css
+
 # production
 /build
 
