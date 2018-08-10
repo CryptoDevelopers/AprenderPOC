@@ -6,8 +6,13 @@ const password = ''; //REDACTED for GITHUB
 const connectionString = 'postgresql://ost:' + password + '@ost-poc.cmsffmdasle7.us-east-1.rds.amazonaws.com:5432/ost';
 const app = express();
 
+const request = require('request');
+const crypto = require('crypto');
+const queryString = require('query-string');
+
+
 OSTSDK = require('@ostdotcom/ost-sdk-js');
-apiEndpoint = 'https://sandboxapi.ost.com/v1.1/';
+const apiEndpoint = 'https://sandboxapi.ost.com/v1.1/';
 const api_key = process.env.KEY;
 const api_secret = process.env.SECRET;
 const ostObj = new OSTSDK({ apiKey: api_key, apiSecret: api_secret, apiEndpoint: apiEndpoint });
@@ -177,6 +182,53 @@ app.route('/users/:username').get((req, res) => {
         });
     });
 });
+
+function generateQueryString(inputParams) {
+    const queryParamsString = queryString.stringify(inputParams, { arrayFormat: 'bracket' }).replace(/%20/g, '+');
+    const stringToSign = apiEndpoint + 'balances/b0851935-b08d-4027-ae33-ed35fe6ac0dc' + '?' + queryParamsString;
+    console.log("stringToSign");
+    console.log(stringToSign);
+    return stringToSign;
+}
+function createTimeString() {
+    var d = new Date();
+    var t = d.getTime();
+    var o = t + "";
+    return o.substring(0, 10);
+}
+function generateApiSignature(stringToSign) {
+    var buff = new Buffer.from(api_secret, 'utf8');
+    var hmac = crypto.createHmac('sha256', buff);
+    hmac.update(stringToSign);
+    return hmac.digest('hex');
+}
+
+app.route('/balances').get((req, res) => {
+    // console.log('\nuser: ' + req.body.user_ids);
+    const user_id = 'b0851935-b08d-4027-ae33-ed35fe6ac0dc'; //req.params['user_id'];
+
+    var requestParams = { api_key: api_key, request_timestamp: createTimeString() };
+    var stringToSign = generateQueryString(requestParams);
+    // string-to-sign = "/balances/b0851935-b08d-4027-ae33-ed35fe6ac0dc?api_key="+api_key+"&request_timestamp="+Date.now()+"&"
+    
+    const endpoint = stringToSign + '&signature=' + generateApiSignature(stringToSign);
+    console.log(endpoint);
+    request.get(
+        endpoint,
+        function (error, response, body) {
+            console.log(body);
+            if (!error && response.statusCode == 200) {
+                console.log("Success! Body:");
+                console.log(body);
+            } else {
+                console.log("Error:");
+                console.log(error);
+            }
+        }
+    );
+
+});
+
 
 app.route('/airdrop').post((req, res) => {
     console.log('\nairdropping ' + req.body.amount + ' to user ' + req.body.user_ids);
