@@ -7,12 +7,16 @@ package-lock.json
 # testing
 /coverage
 
+#style.css
+src/scss/style.css
+
 # production
 /build
 
 # misc
 .DS_Store
 .idea
+.env
 .env.local
 .env.development.local
 .env.test.local

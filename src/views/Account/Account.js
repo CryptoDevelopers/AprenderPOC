@@ -18,11 +18,12 @@ class Account extends Component {
 
     const purchase = {
       buyAmnt: this.state.buyAmnt
+      user_ids: '982131'
     };
 
     console.log(user.buyAmnt)
 
-    axios.post('http://localhost:8000/balance', { purchase })
+    axios.post('http://localhost:8000/airdrop', { purchase })
       .then(res => {
         console.log(res);
         console.log(res.data);
